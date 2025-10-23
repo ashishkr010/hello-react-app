@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  hello-react-app:
+    build: .
+    expose:
+      - "3000"
+    restart: always
+    environment:
+      - NODE_ENV=production
+    networks:
+      - react-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: always
+    networks:
+      - react-network
+    depends_on:
+      - hello-react-app
+
+networks:
+  react-network:
+    driver: bridge
