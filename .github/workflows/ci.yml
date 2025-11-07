@@ -95,8 +95,10 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_KEY_PLAIN }}
         port: 22
-        timeout: 60s
-        command_timeout: 10m
+        timeout: 30s
+        command_timeout: 15m
+        script_stop: true
+        debug: true
         script: |
           set -e
           echo "Starting deployment on VM..."
