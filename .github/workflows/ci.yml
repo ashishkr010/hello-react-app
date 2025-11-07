@@ -93,7 +93,7 @@ jobs:
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_KEY_B64 }}
+        key: ${{ secrets.SSH_KEY_PLAIN }}
         port: 22
         timeout: 60s
         command_timeout: 10m
