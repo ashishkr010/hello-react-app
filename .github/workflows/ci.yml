@@ -104,7 +104,7 @@ jobs:
           cd /home/ashish/my-react-app || { echo "Directory not found"; exit 1; }
           
           echo "Logging into GHCR..."
-          echo "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" | docker login ${{ env.REGISTRY }} -u ashishkr010 --password-stdin
+          echo "${{ secrets.GHCR_PAT }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
           
           echo "Pulling latest image..."
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
