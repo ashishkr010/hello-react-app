@@ -14,6 +14,12 @@ function App() {
     { id: 3, name: 'Chair', price: '$149', category: 'Furniture' },
   ];
 
+  const addresses = [
+    { id: 1, employee: 'John Doe', street: '123 Main St', city: 'New York', zip: '10001' },
+    { id: 2, employee: 'Jane Smith', street: '456 Oak Ave', city: 'Los Angeles', zip: '90210' },
+    { id: 3, employee: 'Bob Johnson', street: '789 Pine Rd', city: 'Chicago', zip: '60601' },
+  ];
+
   return (
     <div className="App">
       <header className="App-header">
@@ -60,6 +66,30 @@ function App() {
                   <td style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>{product.name}</td>
                   <td style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>{product.price}</td>
                   <td style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>{product.category}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <h2 style={{ color: 'white', textAlign: 'center', margin: '30px 0 20px 0' }}>Employee Address Table</h2>
+          <table style={{ width: '100%', borderCollapse: 'collapse', color: 'white' }}>
+            <thead>
+              <tr style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
+                <th style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>ID</th>
+                <th style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>Employee</th>
+                <th style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>Street</th>
+                <th style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>City</th>
+                <th style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>ZIP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {addresses.map(address => (
+                <tr key={address.id}>
+                  <td style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>{address.id}</td>
+                  <td style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>{address.employee}</td>
+                  <td style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>{address.street}</td>
+                  <td style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>{address.city}</td>
+                  <td style={{ padding: '10px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>{address.zip}</td>
                 </tr>
               ))}
             </tbody>

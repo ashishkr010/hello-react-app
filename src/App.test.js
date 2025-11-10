@@ -25,7 +25,8 @@ test('renders Users table with correct headers', () => {
 
 test('renders user data in table', () => {
   render(<App />);
-  expect(screen.getByText('John Doe')).toBeInTheDocument();
+  const johnDoes = screen.getAllByText('John Doe');
+  expect(johnDoes.length).toBeGreaterThan(0);
   expect(screen.getByText('jane@example.com')).toBeInTheDocument();
   expect(screen.getByText('Admin')).toBeInTheDocument();
 });
@@ -45,9 +46,25 @@ test('renders product data in table', () => {
   expect(screen.getByText('Electronics')).toBeInTheDocument();
 });
 
+test('renders Employee Address table with correct headers', () => {
+  render(<App />);
+  expect(screen.getByText('Employee Address Table')).toBeInTheDocument();
+  expect(screen.getByText('Employee')).toBeInTheDocument();
+  expect(screen.getByText('Street')).toBeInTheDocument();
+  expect(screen.getByText('City')).toBeInTheDocument();
+  expect(screen.getByText('ZIP')).toBeInTheDocument();
+});
+
+test('renders address data in table', () => {
+  render(<App />);
+  expect(screen.getByText('123 Main St')).toBeInTheDocument();
+  expect(screen.getByText('New York')).toBeInTheDocument();
+  expect(screen.getByText('90210')).toBeInTheDocument();
+});
+
 test('renders correct number of table rows', () => {
   render(<App />);
   const rows = screen.getAllByRole('row');
-  // Header rows + data rows (3 users + 3 products = 8 total rows, but some are headers)
-  expect(rows.length).toBeGreaterThan(6);
+  // Header rows + data rows (3 users + 3 products + 3 addresses = 12 total rows)
+  expect(rows.length).toBeGreaterThan(10);
 });
