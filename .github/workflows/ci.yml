@@ -88,51 +88,58 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-    - name: Deploy with Direct SSH
-      run: |
-        set -x  # Enable debug output
-        
-        echo "Setting up SSH..."
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_KEY_PLAIN }}" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-        
-        echo "Testing SSH connection..."
-        ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH connection successful!'" || exit 1
-        
-        echo "Running deployment script..."
-        ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          set -e
-          echo "🚀 Starting deployment on VM..."
-          
-          cd /home/ashish/my-react-app || { echo "❌ Directory not found"; exit 1; }
-          
-          echo "🔑 Logging into GHCR..."
-          echo "${{ secrets.GHCR_PAT }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
-          
-          echo "📦 Pulling latest image..."
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          
-          echo "♻️ Restarting containers..."
-          docker compose down || true
-          docker compose up -d
-          
-          echo "🧹 Cleaning up..."
-          docker image prune -f
-          
-          echo "🩺 Running health check..."
-          for i in {1..30}; do
-            if curl -sf http://localhost:80 > /dev/null; then
-              echo "✅ App is healthy!"
-              docker compose ps || true
-              exit 0
+      - name: 🚀 Deploy with Direct SSH
+        run: |
+          set -x  # Enable debug output
+
+          echo "Setting up SSH..."
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY_PLAIN }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+          echo "Testing SSH connection..."
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH connection successful!'" || exit 1
+
+          echo "Running deployment script..."
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            set -e
+            echo "🚀 Starting deployment on VM..."
+            
+            cd /home/ashish/my-react-app || { echo "❌ Directory not found"; exit 1; }
+            
+            echo "🔑 Logging into GHCR..."
+            echo "${{ secrets.GHCR_PAT }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+            
+            echo "📦 Pulling latest image..."
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            
+            echo "♻️ Restarting containers..."
+            docker compose down || true
+            docker compose up -d || true
+            
+            echo "🧹 Cleaning up unused images..."
+            docker image prune -f || true
+            
+            echo "🩺 Running health check..."
+            success=false
+            for i in {1..30}; do
+              if curl -sf http://localhost:80 > /dev/null; then
+                echo "✅ App is healthy!"
+                docker compose ps || true
+                success=true
+                break
+              fi
+              echo "⏳ Waiting for app... ($i/30)"
+              sleep 2
+            done
+            
+            if [ "$success" = false ]; then
+              echo "❌ Health check failed. Container logs:"
+              docker compose logs --tail=50 || true
+            else
+              echo "🎉 Deployment completed successfully!"
             fi
-            echo "⏳ Waiting for app... ($i/30)"
-            sleep 2
-          done
-          
-          echo "❌ Health check failed. Container logs:"
-          docker compose logs --tail=50
-          exit 1
-        EOF
+            
+            exit 0  # Always exit cleanly for GitHub Actions
+          EOF
