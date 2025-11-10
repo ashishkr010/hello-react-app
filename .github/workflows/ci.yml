@@ -125,7 +125,7 @@ jobs:
           for i in {1..30}; do
             if curl -sf http://localhost:80 > /dev/null; then
               echo "✅ App is healthy!"
-              docker compose ps
+              docker compose ps || true
               exit 0
             fi
             echo "⏳ Waiting for app... ($i/30)"
